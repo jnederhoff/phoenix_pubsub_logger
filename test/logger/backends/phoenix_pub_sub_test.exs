@@ -1,5 +1,5 @@
 defmodule Logger.Backends.PhoenixPubSubTest do
-  use ExUnit.Case
+  use Logger.Case
   require Logger
   doctest Logger.Backends.PhoenixPubSub
 
@@ -75,6 +75,7 @@ defmodule Logger.Backends.PhoenixPubSubTest do
              "initial_call=Foo.bar/3 hello"
   end
 
+  @tag ex_vsn("< 1.10.0")
   test "logs domain as metadata" do
     Logger.configure_backend(Logger.Backends.PhoenixPubSub,
       format: "$metadata$message",
@@ -85,6 +86,7 @@ defmodule Logger.Backends.PhoenixPubSubTest do
              "domain=elixir.foobar hello"
   end
 
+  @tag ex_vsn("< 1.10.0")
   test "logs mfa as metadata" do
     Logger.configure_backend(Logger.Backends.PhoenixPubSub,
       format: "$metadata$message",
@@ -98,6 +100,7 @@ defmodule Logger.Backends.PhoenixPubSubTest do
              "mfa=#{mfa} hello"
   end
 
+  @tag ex_vsn("< 1.10.0")
   test "ignores crash_reason metadata when configured with metadata: :all" do
     Logger.configure_backend(Logger.Backends.PhoenixPubSub,
       format: "$metadata$message",
@@ -182,18 +185,5 @@ defmodule Logger.Backends.PhoenixPubSubTest do
     Logger.debug("hello")
 
     assert_receive {:log_message, _message}
-  end
-
-  def capture_log(level \\ :debug, fun) do
-    Logger.configure(level: level)
-
-    fun.()
-
-    receive do
-      {:log_message, value} ->
-        IO.chardata_to_string(value)
-    end
-  after
-    Logger.configure(level: :debug)
   end
 end
