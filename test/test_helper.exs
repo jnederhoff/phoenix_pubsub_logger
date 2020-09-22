@@ -1,4 +1,4 @@
-ExUnit.configure(exclude: [:exclude])
+ExUnit.configure(exclude: [:excluded])
 ExUnit.start()
 
 defmodule Logger.Case do
@@ -23,7 +23,7 @@ defmodule Logger.Case do
     Logger.configure(level: :debug)
   end
 
-  def ex_vsn(target, opts \\ []) do
-    if Version.match?(System.version(), target, opts), do: :exclude
+  def exclude_ex(target, opts \\ []) do
+    if Version.match?(System.version(), target, opts), do: :excluded
   end
 end

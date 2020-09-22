@@ -22,7 +22,8 @@ defmodule Logger.Backends.PhoenixPubSub.MixProject do
   defp deps do
     [
       {:phoenix_pubsub, "~> 2.0"},
-      {:ex_doc, "~> 0.21", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.21", only: :dev, runtime: false},
+      {:tracer, "~> 0.1.1", only: :dev}
     ]
   end
 end

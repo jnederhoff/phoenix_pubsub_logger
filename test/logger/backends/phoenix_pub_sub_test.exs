@@ -75,7 +75,7 @@ defmodule Logger.Backends.PhoenixPubSubTest do
              "initial_call=Foo.bar/3 hello"
   end
 
-  @tag ex_vsn("< 1.10.0")
+  @tag exclude_ex("< 1.10.0")
   test "logs domain as metadata" do
     Logger.configure_backend(Logger.Backends.PhoenixPubSub,
       format: "$metadata$message",
@@ -86,7 +86,7 @@ defmodule Logger.Backends.PhoenixPubSubTest do
              "domain=elixir.foobar hello"
   end
 
-  @tag ex_vsn("< 1.10.0")
+  @tag exclude_ex("< 1.10.0")
   test "logs mfa as metadata" do
     Logger.configure_backend(Logger.Backends.PhoenixPubSub,
       format: "$metadata$message",
@@ -100,7 +100,6 @@ defmodule Logger.Backends.PhoenixPubSubTest do
              "mfa=#{mfa} hello"
   end
 
-  @tag ex_vsn("< 1.10.0")
   test "ignores crash_reason metadata when configured with metadata: :all" do
     Logger.configure_backend(Logger.Backends.PhoenixPubSub,
       format: "$metadata$message",

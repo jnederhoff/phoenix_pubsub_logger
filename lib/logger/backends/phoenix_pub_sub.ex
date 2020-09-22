@@ -121,7 +121,7 @@ defmodule Logger.Backends.PhoenixPubSub do
   end
 
   defp take_metadata(metadata, :all) do
-    metadata
+    Keyword.drop(metadata, [:crash_reason, :ancestors, :callers])
   end
 
   defp take_metadata(metadata, keys) do
