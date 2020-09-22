@@ -120,8 +120,14 @@ defmodule Logger.Backends.PhoenixPubSub do
     Logger.Formatter.format(format, level, msg, ts, take_metadata(md, keys))
   end
 
-  defp take_metadata(metadata, :all) do
-    Keyword.drop(metadata, [:crash_reason, :ancestors, :callers])
+  if Version.match?(System.version(), "> 1.10.0") do
+    defp take_metadata(metadata, :all) do
+      metadata
+    end
+  else
+    defp take_metadata(metadata, :all) do
+      Keyword.drop(metadata, [:crash_reason, :ancestors, :callers])
+    end
   end
 
   defp take_metadata(metadata, keys) do
