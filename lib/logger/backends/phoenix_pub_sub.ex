@@ -14,28 +14,34 @@ defmodule Logger.Backends.PhoenixPubSub do
             topic: nil
 
   def subscribe() do
-    subscribe({__MODULE__, @default_name})
+    subscribe({__MODULE__, @default_name}, [])
   end
 
-  def subscibe(__MODULE__) do
-    subscribe({__MODULE__, @default_name})
+  def subscribe(opts) when is_list(opts) do
+    subscribe({__MODULE__, @default_name}, opts)
   end
 
-  def subscribe({__MODULE__, name}) when is_atom(name) do
+  def subscribe(__MODULE__, opts \\ [])
+
+  def subscribe(__MODULE__, opts) when is_list(opts) do
+    subscribe({__MODULE__, @default_name}, opts)
+  end
+
+  def subscribe({__MODULE__, name}, opts) when is_atom(name) and is_list(opts) do
     config = Application.get_env(:logger, name, [])
     pubsub = Keyword.get(config, :pubsub)
     topic = Keyword.get(config, :topic)
     if pubsub == nil, do: raise(PhoenixPubSubLoggerException, message: "pubsub not configured")
     if topic == nil, do: raise(PhoenixPubSubLoggerException, message: "topic not configured")
 
-    Phoenix.PubSub.subscribe(pubsub, topic)
+    Phoenix.PubSub.subscribe(pubsub, topic, opts)
   end
 
   def unsubscribe() do
     unsubscribe({__MODULE__, @default_name})
   end
 
-  def unsubscibe(__MODULE__) do
+  def unsubscribe(__MODULE__) do
     unsubscribe({__MODULE__, @default_name})
   end
 
