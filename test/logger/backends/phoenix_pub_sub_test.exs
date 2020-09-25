@@ -43,7 +43,24 @@ defmodule Logger.Backends.PhoenixPubSubTest do
   test "pubsub sanity check" do
     Phoenix.PubSub.broadcast(TestPubSub, "logger", {:log_message, "test"})
 
-    assert_received {:log_message, "test"}
+    assert_receive {:log_message, "test"}
+  end
+
+  test "subscibes to channel" do
+    :ok = Phoenix.PubSub.unsubscribe(TestPubSub, "logger")
+    :ok = Logger.Backends.PhoenixPubSub.subscribe()
+
+    Phoenix.PubSub.broadcast(TestPubSub, "logger", {:log_message, "test"})
+
+    assert_receive {:log_message, "test"}
+  end
+
+  test "unsubscibes to channel" do
+    :ok = Logger.Backends.PhoenixPubSub.unsubscribe()
+
+    Phoenix.PubSub.broadcast(TestPubSub, "logger", {:log_message, "test"})
+
+    refute_receive {:log_message, "test"}
   end
 
   test "configures format" do
@@ -62,6 +79,7 @@ defmodule Logger.Backends.PhoenixPubSubTest do
 
     Logger.metadata(user_id: 11)
     Logger.metadata(user_id: 13)
+
     assert capture_log(fn -> Logger.debug("hello") end) =~ "user_id=13 hello"
   end
 
@@ -107,6 +125,7 @@ defmodule Logger.Backends.PhoenixPubSubTest do
     )
 
     Logger.metadata(crash_reason: {%RuntimeError{message: "oops"}, []})
+
     assert capture_log(fn -> Logger.debug("hello") end) =~ "hello"
   end
 
@@ -176,13 +195,11 @@ defmodule Logger.Backends.PhoenixPubSubTest do
         {Logger.Backends.PhoenixPubSub, :number_two},
         pubsub: TestPubSub,
         topic: "number_two",
-        format: "$message"
+        format: "$message #2"
       )
 
-    :ok = Phoenix.PubSub.subscribe(TestPubSub, "number_two")
+    :ok = Logger.Backends.PhoenixPubSub.subscribe({Logger.Backends.PhoenixPubSub, :number_two})
 
-    Logger.debug("hello")
-
-    assert_receive {:log_message, _message}
+    assert capture_log(fn -> Logger.debug("hello") end) =~ "hello #2"
   end
 end

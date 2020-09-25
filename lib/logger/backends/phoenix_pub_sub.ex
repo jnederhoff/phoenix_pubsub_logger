@@ -4,6 +4,8 @@ defmodule Logger.Backends.PhoenixPubSub do
   """
   @behaviour :gen_event
 
+  @default_name :phoenix_pubsub_logger
+
   defstruct name: nil,
             format: nil,
             level: nil,
@@ -11,9 +13,45 @@ defmodule Logger.Backends.PhoenixPubSub do
             pubsub: nil,
             topic: nil
 
+  def subscribe() do
+    subscribe({__MODULE__, @default_name})
+  end
+
+  def subscibe(__MODULE__) do
+    subscribe({__MODULE__, @default_name})
+  end
+
+  def subscribe({__MODULE__, name}) when is_atom(name) do
+    config = Application.get_env(:logger, name, [])
+    pubsub = Keyword.get(config, :pubsub)
+    topic = Keyword.get(config, :topic)
+    if pubsub == nil, do: raise(PhoenixPubSubLoggerException, message: "pubsub not configured")
+    if topic == nil, do: raise(PhoenixPubSubLoggerException, message: "topic not configured")
+
+    Phoenix.PubSub.subscribe(pubsub, topic)
+  end
+
+  def unsubscribe() do
+    unsubscribe({__MODULE__, @default_name})
+  end
+
+  def unsubscibe(__MODULE__) do
+    unsubscribe({__MODULE__, @default_name})
+  end
+
+  def unsubscribe({__MODULE__, name}) when is_atom(name) do
+    config = Application.get_env(:logger, name, [])
+    pubsub = Keyword.get(config, :pubsub)
+    topic = Keyword.get(config, :topic)
+    if pubsub == nil, do: raise(PhoenixPubSubLoggerException, message: "pubsub not configured")
+    if topic == nil, do: raise(PhoenixPubSubLoggerException, message: "topic not configured")
+
+    Phoenix.PubSub.unsubscribe(pubsub, topic)
+  end
+
   @impl :gen_event
   def init(__MODULE__) do
-    init({__MODULE__, :phoenix_pubsub_logger})
+    init({__MODULE__, @default_name})
   end
 
   def init({__MODULE__, name}) when is_atom(name) do
